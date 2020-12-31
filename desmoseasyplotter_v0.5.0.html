@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html>
+
+	<!-- 
+	
+	CHANGELOG:
+	
+	v0.5.0
+	- added colour selection for 'cubics'
+	- added colour selection for 'linears'
+	+ implemented 'linears'
+	! removed "Not implemented yet" popup, will use disabled button instead
+	
+	v0.4.0
+	- new favicon
+	- added return statements and semi-colons
+	- linear is clickable
+	- adjusted various paddings/sizes/positions
+	+ added unused 'root' button
+	+ added colour buttons
+	+ added colour selection for 'quadratics'
+	* added dropdown menus
+	
+	
+	v0.3.0
+	+ implemented cubics
+	
+	v0.2.1
+	- reversed changelog order
+	
+	v0.2.0
+	- rejigged button classes and HTML elements
+	- added animation and changed colours on buttons
+	- changed 'parabola' to 'quadratic'
+	+ expanded 'place' to every function simultaneously
+	+ rejigged function IDs also allowing multiple instances of each function
+	+ added 'cubic' and 'linear' unused buttons
+	! temprarily removed colour addition on placement
+	
+	v0.1.1
+	- fixed bounds on placed parabolas
+
+	v0.1.0
+	* created
+	
+	- tweaks/bug fixes
+	+ additions
+	* major changes/additions
+	! things removed
+	
+	FUTURE CHANGES OR ADDITIONS: 
+	- add {polygons, roots, logs, circles}
+	- add {regression from user guide, crop middle} features
+	- combine quad/cubic/linear
+	
+	-->
+
+	<head>
+	
+		<title>Line Plotter</title>
+		<link href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAANNklAP///wBp8lwARug4AA+1AAAZwgoApv+eAIr/gABc7U4Ad/prADveLAAn0RcAAAAAAAAAAAAAAAAACUQRxmVmVVCZRLHMZmZlVZmSIczGZmZVOSRCHMxmZmUylEsszMZmZjKURCHMzGZmI5lEshzMzGYjOZRCsRHMzKM5lEQhERzCqjOZRCsRERKKozOUQrERIYiqo5lClLsreIqqM5kpkkR4iKqjOUIpRHiIiqqjmZmZB3eIqqMzmZCAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAA" rel="icon" type="image/x-icon" />
+		<script src="https://www.desmos.com/api/v1.5/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+		
+	</head>
+	
+	<style>
+	
+	.button {
+		border-radius: 8px;
+		border: 2px solid black;
+		color: black;
+		background-color: #DDDDDD;
+		text-align: center;
+		font-size: 16px;
+		transition-duration: 0.2s;
+		position: fixed;
+		top: 10px;
+		width: 140px;
+		height: 60px;
+	}
+	
+	.animate:hover {
+		background-color: #FFFFFF;
+	}
+	
+	.button1 {
+		color: white;
+		background-color: #555555;
+	}
+	
+	.button1:hover {
+		color: black;
+	}
+	
+	.disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+	
+	.popup {
+		display: none;
+		position: fixed;
+		top: 5px;
+		border: 2px solid black;
+		z-index: 10;
+		background-color: white;
+		width: 150px;
+	}
+	
+	.popbutton {
+		border-radius: 8px;
+		border: 2px solid black;
+		color: black;
+		background-color: #DDDDDD;
+		text-align: center;
+		font-size: 16px;
+		transition-duration: 0.2s;
+		width: 140px;
+		margin-top: 3px; 
+		margin-left: 5px;
+		height: 40px;
+	}
+	
+	.red {
+		color: white;
+		background-color: #c74440;
+	}
+	
+	.red:hover {
+		color: black;
+	}
+	
+	.blue {
+		color: white;
+		background-color: #2d70b3;
+	}
+	
+	.blue:hover {
+		color: black;
+	}
+	
+	.green {
+		color: white;
+		background-color: #388c46;
+	}
+	
+	.green:hover {
+		color: black;
+	}
+	
+	.black {
+		color: white;
+		background-color: black;
+	}
+	
+	.black:hover {
+		color: black;
+	}
+	
+	.pink {
+		color: white;
+		background-color: #fb00ff;
+	}
+	
+	.pink:hover {
+		color: black;
+	}
+	
+	.yellow {
+		color: black;
+		background-color: #eeee00;
+	}
+	
+	.yellow:hover {
+		
+	}
+	
+	</style>
+	
+	<body>
+		<div id="button-bar" style="height: 70px;">
+			<button class="button animate button1" style="left: 10px;" onclick="place()">Place Functions</button>
+			<button class="button animate" style="left: 160px;" onclick="popups(2)">Quadratic</button>
+			<div class="popup" id="quadraticForm" style="left: 153px;">
+				<button class="popbutton animate" style="margin-bottom: 20px; height: 60px;" onclick="closePopups(2)">Close</button>
+				<button class="popbutton animate red" onclick="defineQuadratic('red')">Red</button>
+				<button class="popbutton animate blue" onclick="defineQuadratic('blue')">Blue</button>
+				<button class="popbutton animate green" onclick="defineQuadratic('green')">Green</button>
+				<button class="popbutton animate black" onclick="defineQuadratic('black')">Black</button>
+				<button class="popbutton animate pink" onclick="defineQuadratic('pink')">Pink</button>
+				<button class="popbutton animate yellow" onclick="defineQuadratic('yellow')">Yellow</button>
+			</div>
+			<button class="button animate" style="left: 310px;" onclick="popups(3)">Cubic</button>
+			<div class="popup" id="cubicForm" style="left: 303px;">
+				<button class="popbutton animate" style="margin-bottom: 20px; height: 60px;" onclick="closePopups(3)">Close</button>
+				<button class="popbutton animate red" onclick="defineCubic('red')">Red</button>
+				<button class="popbutton animate blue" onclick="defineCubic('blue')">Blue</button>
+				<button class="popbutton animate green" onclick="defineCubic('green')">Green</button>
+				<button class="popbutton animate black" onclick="defineCubic('black')">Black</button>
+				<button class="popbutton animate pink" onclick="defineCubic('pink')">Pink</button>
+				<button class="popbutton animate yellow" onclick="defineCubic('yellow')">Yellow</button>
+			</div>
+			<button class="button animate" style="left: 460px;" onclick="popups(4)">Linear</button>
+			<div class="popup" id="linearForm" style="left: 453px;">
+				<button class="popbutton animate" style="margin-top: 3px; margin-bottom: 20px; height: 60px;" onclick="closePopups(4)">Close</button>
+				<button class="popbutton animate red" onclick="defineLinear('red')">Red</button>
+				<button class="popbutton animate blue" onclick="defineLinear('blue')">Blue</button>
+				<button class="popbutton animate green" onclick="defineLinear('green')">Green</button>
+				<button class="popbutton animate black" onclick="defineLinear('black')">Black</button>
+				<button class="popbutton animate pink" onclick="defineLinear('pink')">Pink</button>
+				<button class="popbutton animate yellow" onclick="defineLinear('yellow')">Yellow</button>
+			</div>
+			<button class="button disabled" style="left: 610px;" onclick="">Root</button>
+		</div>
+		<div id="calculator" style="width: 1200px; height: 600px;"></div>
+		
+		<!--<h3 style="text-align: center;">Not implemented yet!</h3>-->
+		
+		<script>
+		
+			//create calculator
+            var Calc = Desmos.Calculator(document.getElementById('calculator'));
+			
+			//bonus colors
+			Calc.colors.GRAY = "#888888";
+			Calc.colors.PINK = "#fb00ff";
+			Calc.colors.AQUA = "#18f2f2";
+			Calc.colors.YELLOW = "#eeee00";
+			Calc.colors.LIME = "#00ff84";
+			Calc.colors.BROWN = "#8B4513";
+			
+			//FUNCTION COUNTERS
+			qeqns = -1;
+			qplaced = -1;
+			ceqns = -1;
+			cplaced = -1;
+			leqns = -1;
+			lplaced = -1;
+			popup_open = -1;
+			
+			//QUADRATICS
+			function defineQuadratic(color) {
+				qeqns++;
+				Calc.setExpression({ id: "Qa"+qeqns, latex: "x_{qvertex" + qeqns + "}=0" });
+				Calc.setExpression({ id: "Qb"+qeqns, latex: "y_{qvertex" + qeqns + "}=0" });
+				Calc.setExpression({ id: "Qc"+qeqns, latex: "x_{qarm" + qeqns + "}=1" });
+				Calc.setExpression({ id: "Qd"+qeqns, latex: "y_{qarm" + qeqns + "}=1" });
+				Calc.setExpression({ id: "Qe"+qeqns, latex: "l_{ql" + qeqns + "}=-3" });
+				Calc.setExpression({ id: "Qf"+qeqns, latex: "l_{qr" + qeqns + "}=3" });
+				Calc.setExpression({ id: "Qg"+qeqns, latex: "\\left(x_{qvertex" + qeqns + "},\ y_{qvertex" + qeqns + "}\\right)", color: Calc.colors.BLACK });
+				Calc.setExpression({ id: "Qh"+qeqns, latex: "\\left(x_{qarm" + qeqns + "},\ y_{qarm" + qeqns + "}\\right)", color: Calc.colors[color.toUpperCase()] });
+				Calc.setExpression({ id: "Qi"+qeqns, latex: "\\left(l_{ql" + qeqns + "},\ f_{q" + qeqns + "}\\left(l_{ql" + qeqns + "}\\right)\\right)", color: Calc.colors.GRAY });
+				Calc.setExpression({ id: "Qj"+qeqns, latex: "\\left(l_{qr" + qeqns + "},\ f_{q" + qeqns + "}\\left(l_{qr" + qeqns + "}\\right)\\right)", color: Calc.colors.GRAY });
+				Calc.setExpression({ id: "Qk"+qeqns, latex: "f_{q" + qeqns + "}\\left(x\\right)=\\frac{y_{qarm" + qeqns + "}-y_{qvertex" + qeqns + "}}{\\left(x_{qarm" + qeqns + "}-x_{qvertex" + qeqns + "}\\right)^{2}}\\left(x-x_{qvertex" + qeqns + "}\\right)^{2}+y_{qvertex" + qeqns + "}\\left\\{l_{ql" + qeqns + "}\\le x\\le l_{qr" + qeqns + "}\\right\\}", color: Calc.colors[color.toUpperCase()], lineStyle: "DASHED" });
+				return;
+			}
+
+			function placeQuadratic() {
+				expr = Calc.getState().expressions;
+				for (q = qeqns; q > qplaced; q--) { //loop for unplaced functions
+					vals = new Array(6);
+					exists = false;
+					color = "";
+					for (i = 0; i < expr.list.length; i++) { //get variables
+						if (expr.list[i].id == "Qa"+q) vals[0] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Qb"+q) vals[1] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Qc"+q) vals[2] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Qd"+q) vals[3] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Qe"+q) vals[4] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Qf"+q) vals[5] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Qk"+q) {
+							exists = true;
+							color = expr.list[i].color;
+						}
+					}
+					if (exists) { //place equation
+						a = (vals[3]-vals[1])/Math.pow(vals[2]-vals[0],2);
+						Calc.setExpression({ id: "quadratic"+q, latex: "y=" + a + "\\left(x-" + vals[0] + "\\right)^{2}+" + vals[1] + "\\left\\{" + vals[4] + "\\le x\\le " + vals[5] + "\\right\\}", color: color });
+					}
+				}
+				for (i = 0; i < expr.list.length; i++) { //remove helpers
+					if (expr.list[i].id.search("Q") >= 0) {
+						Calc.removeExpression({ id: expr.list[i].id });  
+					}
+				}
+				qplaced = qeqns;
+				return;
+			}
+			
+			//CUBIC
+			function defineCubic(color) {
+				ceqns++;
+				Calc.setExpression({ id: "Ca"+ceqns, latex: "x_{cinflection" + ceqns + "}=0" });
+				Calc.setExpression({ id: "Cb"+ceqns, latex: "y_{cinflection" + ceqns + "}=0" });
+				Calc.setExpression({ id: "Cc"+ceqns, latex: "x_{carm" + ceqns + "}=1" });
+				Calc.setExpression({ id: "Cd"+ceqns, latex: "y_{carm" + ceqns + "}=1" });
+				Calc.setExpression({ id: "Ce"+ceqns, latex: "l_{cl" + ceqns + "}=-2" });
+				Calc.setExpression({ id: "Cf"+ceqns, latex: "l_{cr" + ceqns + "}=2" });
+				Calc.setExpression({ id: "Cg"+ceqns, latex: "\\left(x_{cinflection" + ceqns + "},\ y_{cinflection" + ceqns + "}\\right)", color: Calc.colors.BLACK });
+				Calc.setExpression({ id: "Ch"+ceqns, latex: "\\left(x_{carm" + ceqns + "},\ y_{carm" + ceqns + "}\\right)", color: Calc.colors[color.toUpperCase()] });
+				Calc.setExpression({ id: "Ci"+ceqns, latex: "\\left(l_{cl" + ceqns + "},\ f_{c" + ceqns + "}\\left(l_{cl" + ceqns + "}\\right)\\right)", color: Calc.colors.GRAY });
+				Calc.setExpression({ id: "Cj"+ceqns, latex: "\\left(l_{cr" + ceqns + "},\ f_{c" + ceqns + "}\\left(l_{cr" + ceqns + "}\\right)\\right)", color: Calc.colors.GRAY });
+				Calc.setExpression({ id: "Ck"+ceqns, latex: "f_{c" + ceqns + "}\\left(x\\right)=\\frac{y_{carm" + ceqns + "}-y_{cinflection" + ceqns + "}}{\\left(x_{carm" + ceqns + "}-x_{cinflection" + ceqns + "}\\right)^{3}}\\left(x-x_{cinflection" + ceqns + "}\\right)^{3}+y_{cinflection" + ceqns + "}\\left\\{l_{cl" + ceqns + "}\\le x\\le l_{cr" + ceqns + "}\\right\\}", color: Calc.colors[color.toUpperCase()], lineStyle: "DASHED" });
+				return;
+			}
+
+			function placeCubic() {
+				expr = Calc.getState().expressions;
+				for (q = ceqns; q > cplaced; q--) { //loop for unplaced functions
+					vals = new Array(6);
+					exists = false;
+					color = "";
+					for (i = 0; i < expr.list.length; i++) { //get variables
+						if (expr.list[i].id == "Ca"+q) vals[0] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Cb"+q) vals[1] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Cc"+q) vals[2] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Cd"+q) vals[3] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Ce"+q) vals[4] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Cf"+q) vals[5] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Ck"+q) {
+							exists = true;
+							color = expr.list[i].color;
+						}
+					}
+					if (exists) { //place equation
+						a = (vals[3]-vals[1])/Math.pow(vals[2]-vals[0],3);
+						Calc.setExpression({ id: "cubic"+q, latex: "y=" + a + "\\left(x-" + vals[0] + "\\right)^{3}+" + vals[1] + "\\left\\{" + vals[4] + "\\le x\\le " + vals[5] + "\\right\\}", color: color });
+					}
+				}
+				for (i = 0; i < expr.list.length; i++) { //remove helpers
+					if (expr.list[i].id.search("C") >= 0) {
+						Calc.removeExpression({ id: expr.list[i].id });  
+					}
+				}
+				cplaced = ceqns;
+				return;
+			}
+			
+			//LINEAR
+			function defineLinear(color) {
+				leqns++;
+				Calc.setExpression({ id: "La"+leqns, latex: "x_{lanchor" + leqns + "}=0" });
+				Calc.setExpression({ id: "Lb"+leqns, latex: "y_{lanchor" + leqns + "}=0" });
+				Calc.setExpression({ id: "Lc"+leqns, latex: "x_{larm" + leqns + "}=1" });
+				Calc.setExpression({ id: "Ld"+leqns, latex: "y_{larm" + leqns + "}=1" });
+				Calc.setExpression({ id: "Le"+leqns, latex: "l_{ll" + leqns + "}=-2" });
+				Calc.setExpression({ id: "Lf"+leqns, latex: "l_{lr" + leqns + "}=2" });
+				Calc.setExpression({ id: "Lg"+leqns, latex: "\\left(x_{lanchor" + leqns + "},\ y_{lanchor" + leqns + "}\\right)", color: Calc.colors.BLACK });
+				Calc.setExpression({ id: "Lh"+leqns, latex: "\\left(x_{larm" + leqns + "},\ y_{larm" + leqns + "}\\right)", color: Calc.colors[color.toUpperCase()] });
+				Calc.setExpression({ id: "Li"+leqns, latex: "\\left(l_{ll" + leqns + "},\ f_{l" + leqns + "}\\left(l_{ll" + leqns + "}\\right)\\right)", color: Calc.colors.GRAY });
+				Calc.setExpression({ id: "Lj"+leqns, latex: "\\left(l_{lr" + leqns + "},\ f_{l" + leqns + "}\\left(l_{lr" + leqns + "}\\right)\\right)", color: Calc.colors.GRAY });
+				Calc.setExpression({ id: "Lk"+leqns, latex: "f_{l" + leqns + "}\\left(x\\right)=\\frac{y_{larm" + leqns + "}-y_{lanchor" + leqns + "}}{\\left(x_{larm" + leqns + "}-x_{lanchor" + leqns + "}\\right)^{1}}\\left(x-x_{lanchor" + leqns + "}\\right)^{1}+y_{lanchor" + leqns + "}\\left\\{l_{ll" + leqns + "}\\le x\\le l_{lr" + leqns + "}\\right\\}", color: Calc.colors[color.toUpperCase()], lineStyle: "DASHED" });
+				return;
+			}
+
+			function placeLinear() {
+				expr = Calc.getState().expressions;
+				for (q = leqns; q > lplaced; q--) { //loop for unplaced functions
+					vals = new Array(6);
+					exists = false;
+					color = "";
+					for (i = 0; i < expr.list.length; i++) { //get variables
+						if (expr.list[i].id == "La"+q) vals[0] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Lb"+q) vals[1] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Lc"+q) vals[2] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Ld"+q) vals[3] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Le"+q) vals[4] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Lf"+q) vals[5] = expr.list[i].latex.substring(expr.list[i].latex.search("=")+1);
+						else if (expr.list[i].id == "Lk"+q) {
+							exists = true;
+							color = expr.list[i].color;
+						}
+					}
+					if (exists) { //place equation
+						a = (vals[3]-vals[1])/(vals[2]-vals[0]);
+						Calc.setExpression({ id: "linear"+q, latex: "y=" + a + "\\left(x-" + vals[0] + "\\right)^{1}+" + vals[1] + "\\left\\{" + vals[4] + "\\le x\\le " + vals[5] + "\\right\\}", color: color });
+					}
+				}
+				for (i = 0; i < expr.list.length; i++) { //remove helpers
+					if (expr.list[i].id.search("L") >= 0) {
+						Calc.removeExpression({ id: expr.list[i].id });  
+					}
+				}
+				lplaced = leqns;
+				return;
+			}
+			
+			//PLACING
+			function place() {
+				placeQuadratic();
+				placeCubic();
+				placeLinear();
+				return;
+			}
+			
+			//POPUPS
+			function popups(toopen) {
+				if (popup_open == -1) {
+					openPopups(toopen);
+				} else {
+					closePopups(popup_open);
+					openPopups(toopen);
+				}
+				return;
+			}
+			
+			function closePopups(toclose) {
+				if (toclose == 2) {
+					document.getElementById("quadraticForm").style.display = "none";
+				} else if (toclose == 3) {
+					document.getElementById("cubicForm").style.display = "none";
+				} else if (toclose == 4) {
+					document.getElementById("linearForm").style.display = "none";
+				}
+				popup_open = -1;
+				return;
+			}
+			
+			function openPopups(toopen) {
+				if (toopen == 2) {
+					document.getElementById("quadraticForm").style.display = "block";
+				} else if (toopen == 3) {
+					document.getElementById("cubicForm").style.display = "block";
+				} else if (toopen == 4) {
+					document.getElementById("linearForm").style.display = "block";
+				}
+				popup_open = toopen;
+				return;
+			}
+			
+        </script>
+	</body>
+	
+</html>
